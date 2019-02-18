@@ -15,10 +15,6 @@ class SmsRequestsController < ApplicationController
           resp.message body: pixel.errors.values.flatten.join('\n')
         end
 
-      # msg should be displayed
-      elsif msg.length <= 3
-        resp.message body: "rendering: #{msg}"
-
       # Reset the session
       elsif msg == ':reset'
         session = Session.create
@@ -28,7 +24,13 @@ class SmsRequestsController < ApplicationController
         else
           resp.message body: 'something went wrong. I could not reset the session.'
         end
+
+      # msg should be displayed
+      elsif msg.length <= 4
         
+        Messenger.send_msg(msg)
+        resp.message body: "rendering: #{msg}"
+
       # msg is an unknown command.
       else
         resp.message body: "I don't know what to do with: '#{msg}'"
