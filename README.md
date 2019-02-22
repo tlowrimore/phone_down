@@ -14,5 +14,6 @@
 The following is a list of availble SMS commands.
 
 - `:reset`: resets the session, removing all previously registered phone numbers.
+- `:remove <coordinate>`: resets the pixel at `<coordinate>`.
 - `<coordinate>`: registers the phone from which the coordinate was sent, with the current session.  A `<coordinate>` is a letter, a-z followed by a number.  E.g. `a4`,
 - `<word>`: a word containing 4 or less characters, to be rendered on the _screen_ of phones.  E.g. `love`.

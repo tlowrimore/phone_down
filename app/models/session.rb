@@ -15,4 +15,9 @@ class Session < ApplicationRecord
     .create_with(coordinate: coordinate)
     .find_or_create_by phone_number: phone_number
   end
+
+  def remove_pixel(coordinate:)
+    pixel = pixels.find_by(coordinate: coordinate)
+    pixel && pixel.destroy
+  end
 end

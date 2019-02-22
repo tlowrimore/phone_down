@@ -7,6 +7,8 @@ class SmsRequestsController < ApplicationController
 
       # msg represents a coordinate
       if msg =~ /^[a-z]\d+$/
+        status "Adding pixel at: #{msg}"
+
         pixel = Session.current.add_pixel phone_number: from, coordinate: msg
 
         if pixel.errors.blank?
@@ -15,8 +17,15 @@ class SmsRequestsController < ApplicationController
           resp.message body: pixel.errors.values.flatten.join('\n')
         end
 
+      elsif msg =~ /^\:remove\s*([a-z]\d)+$/
+        status "Removing pixel at: #{$1}"
+
+        Session.current.remove_pixel(coordinate: $1)
+        resp.message body: "The phone at #{$1} has been removed."
+
       # Reset the session
       elsif msg == ':reset'
+        status "Resetting session"
         session = Session.create
 
         if session.errors.blank?
@@ -27,12 +36,14 @@ class SmsRequestsController < ApplicationController
 
       # msg should be displayed
       elsif msg.length <= 4
-        
+        status "Rendering message: #{msg}"
+
         Messenger.send_msg(msg)
         resp.message body: "rendering: #{msg}"
 
       # msg is an unknown command.
       else
+        status "Unknown command received: #{msg}"
         resp.message body: "I don't know what to do with: '#{msg}'"
       end
     end
@@ -41,6 +52,12 @@ class SmsRequestsController < ApplicationController
   end
 
   private
+
+  def status(msg)
+    puts '~' * 40
+    puts msg
+    puts '~' * 40
+  end
 
   def safe_params
     params.permit(:Body, :From)
