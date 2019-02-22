@@ -7,14 +7,20 @@ class SmsRequestsController < ApplicationController
 
       # msg represents a coordinate
       if msg =~ /^[a-z]\d+$/
-        status "Adding pixel at: #{msg}"
+        if Session.current.pixel_exists?(coordinate: msg)
+          status "Pixel collision.  Doing nothing."
 
-        pixel = Session.current.add_pixel phone_number: from, coordinate: msg
-
-        if pixel.errors.blank?
-          resp.message body: "place your phone in the pocket: #{msg}"
+          resp.message body: "a phone is already in the pocket: #{msg}.  Talk to Ondine."
         else
-          resp.message body: pixel.errors.values.flatten.join('\n')
+          status "Adding pixel at: #{msg}"
+
+          pixel = Session.current.add_pixel phone_number: from, coordinate: msg
+
+          if pixel.errors.blank?
+            resp.message body: "place your phone in the pocket: #{msg}"
+          else
+            resp.message body: pixel.errors.values.flatten.join('\n')
+          end
         end
 
       elsif msg =~ /^\:remove\s*([a-z]\d)+$/

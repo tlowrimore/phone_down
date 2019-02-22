@@ -8,6 +8,10 @@ class Session < ApplicationRecord
     last || create
   end
 
+  def pixel_exists?(coordinate:)
+    pixels.exists?(coordinate: coordinate)
+  end
+
   # Registers a new pixel in the session.  If the number already exists for this
   # session, the call is a no-op.
   def add_pixel(phone_number:, coordinate:)
